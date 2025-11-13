@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Surveillance Robot</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #0a0f24, #000);
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #00eaff, #0077ff, #00ffea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px #00eaff88;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .controller {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #00eaff33;
+      backdrop-filter: blur(10px);
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    button {
+      background: linear-gradient(145deg, #00eaff, #0077ff);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      margin: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00eaff55;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px #00eaffaa;
+    }
+
+    .speed-control {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      width: 200px;
+      accent-color: #00eaff;
+    }
+
+    .log-box {
+      margin-top: 30px;
+      width: 300px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #00eaff44;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 10px;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 CAMPUS SURVEILLANCE ROBOT 🤖</h1>
+
+  <div class="controller">
+    <div class="row">
+      <button onclick="sendCommand('start')">🚀 START</button>
+      <button onclick="sendCommand('stop')">⏹ STOP</button>
+    </div>
+
+    <div class="speed-control">
+      <label>Speed: <span id="speedValue">50</span>%</label><br>
+      <input type="range" min="0" max="100" value="50" id="speedSlider" oninput="updateSpeed(this.value)">
+    </div>
+
+    <div class="log-box" id="logBox"></div>
+  </div>
+
+  <footer>Developed with ❤️ using Django & Raspberry Pi</footer>
+
+  <script>
+  let speed = 50;
+
+  function updateSpeed(value) {
+    speed = value;
+    document.getElementById('speedValue').innerText = value;
+  }
+
+  function logMessage(msg) {
+    const box = document.getElementById("logBox");
+    const time = new Date().toLocaleTimeString();
+    box.innerHTML += `<div>[${time}] ${msg}</div>`;
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function sendCommand(cmd) {
+    // ✅ Your Raspberry Pi IP (Backend)
+    const serverIP = "192.168.137.243"; 
+    const url = `http://${serverIP}:8000/move/?cmd=${cmd}&speed=${speed}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        logMessage(data.action || "✅ Command sent successfully");
+      })
+      .catch(() => {
+        logMessage("⚠️ Failed to connect to Raspberry Pi!");
+      });
+  }
+  </script>
+</body>
+</html>
